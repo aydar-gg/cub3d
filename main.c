@@ -16,14 +16,20 @@ void	make_map(t_list **str_map, int size, t_vars *vars)
 		i++;
 	}
 	i = 0;
-	while (vars->t_map[i])//пычатает карту как 1, 0, 2
+	while (vars->t_map[i])//пычатает карту как 1, 0, 2 и ищет позицию игрока
 	{
-		ft_putendl_fd(vars->t_map[i], 1);
+		if (ft_strchr(vars->t_map[i], 'N') || ft_strchr(vars->t_map[i], 'S') || \
+		ft_strchr(vars->t_map[i], 'E') || ft_strchr(vars->t_map[i], 'W'))
+		{
+			vars->plr_y = i * s_map;
+			vars->plr_x = (ft_strlen(vars->t_map[i]) - ft_strlen(ft_strchr(vars->t_map[i], 'N'))) * s_map;
+		}
+		//ft_putendl_fd(vars->t_map[i], 1);
 		i++;
 	}
 }
 
-void	read_map(int argc, char **argv, t_vars *vars)
+void	read_map(char **argv, t_vars *vars)
 {
 	char *line;
 	t_list *str_map;
@@ -35,7 +41,7 @@ void	read_map(int argc, char **argv, t_vars *vars)
 	vars->fd = open(argv[1], O_RDONLY);
 	while (get_next_line(vars->fd, &line) > 0)
 	{
-		if (vars->max_map_width < ft_strlen(line))
+		if (vars->max_map_width < (int)ft_strlen(line))
 			vars->max_map_width = (int)ft_strlen(line);
 		ft_lstadd_back(&str_map, ft_lstnew(line));
 		vars->max_map_hight++;
@@ -45,21 +51,21 @@ void	read_map(int argc, char **argv, t_vars *vars)
 }
 
 
-int		v_test(int keycode, t_vars *vars)
+//int		v_test(int keycode, t_vars *vars)
+//{
+//	if (keycode == 53)// при нажатии esc окно закрывается
+//	{
+//		mlx_destroy_window(vars->mlx, vars->win);
+//		exit(0);
+//	}
+//	printf("%d\n", keycode);
+//	return (0);
+//}
+
+int		v_test_2(int keycode)
 {
-	if (keycode == 53)// при нажатии esc окно закрывается
-	{
-		mlx_destroy_window(vars->mlx, vars->win);
-		exit(0);
-	}
-	printf("%d\n", keycode);
-	return (0);
-}
-int		v_test_2(int keycode, t_vars *vars)
-{
-	int x = 0;
-	int y = 0;
-	//printf("%s\n", vars->win);
+	//int x = 0;
+	//int y = 0;
 	//mlx_mouse_hide(); //прячет мышку при нажатии на игруn
 	if (keycode ==53)
 		exit (0);
@@ -86,15 +92,15 @@ void	my_mlx_pixel_put(t_vars *data, int x, int y, int color)
 //	printf("%d:%d\n", i, j);
 //}
 
-void	print_map_2d(t_vars *vars)
+void	print_map_2d(t_vars *vars)	//быстрая рисовка линий
 {
 	int k, k_2;
 	int h, h_2;
 	int i;
 	int l;
+	float z;
 
 	i = 0;
-	//быстрая рисовка линий
 
 	vars->img_ptr = mlx_new_image(vars->mlx, vars->width, vars->hight);
 	vars->img_data = mlx_get_data_addr(vars->img_ptr, &vars->bpp, &vars->line_length, &vars->endian);
@@ -108,63 +114,110 @@ void	print_map_2d(t_vars *vars)
 			if (vars->t_map[i][l] == '1')
 			{
 				k_2 = k;
-				while (k != k_2 + 10)
+				while (k != k_2 + s_map)
 				{
 					h_2 = h;
-					while (h != h_2 + 10)
+					while (h != h_2 + s_map)
 					{
 						my_mlx_pixel_put(vars, h, k, 0x00AAFF00);
-						//mlx_pixel_put(vars->mlx, vars->win, h, k, 0x00AA0000);
 						h++;
 					}
-					h -= 10;
+					h -= s_map;
 					k++;
 				}
-				k -= 10;
-				mlx_put_image_to_window(vars->mlx, vars->win, vars->img_ptr, 0, 0);
+				k -= s_map;
 			}
-				h += 10;
+				h += s_map;
 			l++;
 		}
-		k += 10;
+		k += s_map;
 		i++;
 	}
+
+	//i = 0;
+	//while (i != s_map)
+	//{
+	//	k = 0;
+	//	while (k != s_map)
+	//	{
+	//		my_mlx_pixel_put(vars, vars->plr_x + k, vars->plr_y + i, 0x000000FF);
+	//		k++;
+	//	}
+	//	i++;
+	//}
+	z = 0;
+	vars->x_line = vars->plr_x;
+	vars->y_line = vars->plr_y;
+	//vars->plr_x += cos(vars->x_reycast);
+	//vars->plr_y += sin(vars->y_reycast);
+	while ((int)z != 40)
+	{
+		vars->x_line += cos(vars->x_reycast);
+		vars->y_line += sin(vars->y_reycast);
+		if (vars->t_map[(int)vars->y_line / s_map][(int)vars->x_line / s_map] != '0')
+		{
+			//vars->dir = sqrt(pow(vars->x_line / s_map - vars->plr_x, 2) + pow(vars->y_line / s_map - vars->plr_y, 2));
+			//vars->alpha = vars->dir / (vars->x_line / s_map);
+			//vars->beta = vars->dir / (vars->y_line / s_map);
+			break ;
+		}
+		my_mlx_pixel_put(vars, vars->x_line, vars->y_line, 0x00FF0000);
+		z += 0.1;
+	}
+	mlx_put_image_to_window(vars->mlx, vars->win, vars->img_ptr, 0, 0);
 }
 
 int key_press(int keycode, t_vars *vars)
 {
-	//mlx_clear_window(vars.mlx, vars.win);
-	//mlx_destroy_image(vars.mlx, vars.img_ptr);
-	//vars.img_ptr = mlx_new_image(vars.mlx, 1000, 1000);
-	if (keycode == 13)//UP
-		vars->plr_y--;
+	if (keycode == 13)//FORWARD
+	{
+		vars->plr_x += cos(vars->x_reycast);
+		vars->plr_y += sin(vars->y_reycast);
+		//vars->plr_y--;
+	}
 	if (keycode == 0)//LEFT
-		vars->plr_x--;
-	if (keycode == 1)//DOWN
-		vars->plr_y++;
+	{
+		vars->plr_x += cos(vars->x_reycast + M_PI/2);
+		vars->plr_y += sin(vars->y_reycast + M_PI/2);
+		//vars->plr_x--;
+	}
+	if (keycode == 1)//BACK
+	{
+		vars->plr_x -= cos(vars->x_reycast);
+		vars->plr_y -= sin(vars->y_reycast);
+		//vars->plr_y++;
+	}
 	if (keycode == 2)//RIGHT
-		vars->plr_x++;
-	printf("position - %d %d\n", vars->plr_x, vars->plr_y);
-	vars->img_ptr = mlx_new_image(vars->mlx, vars->width, vars->hight);
-	vars->img_data = mlx_get_data_addr(vars->img_ptr, &vars->bpp, &vars->line_length, &vars->endian);
-	//mlx_pixel_put(vars->mlx, vars->win, vars->plr_x, vars->plr_y, 0xFFFFFF);
-	//mlx_pixel_put(vars->mlx, vars->win, vars->plr_x + 1, vars->plr_y + 1, 0xFFFFFF);
-	//mlx_pixel_put(vars->mlx, vars->win, vars->plr_x + 1, vars->plr_y, 0xFFFFFF);
-	//mlx_pixel_put(vars->mlx, vars->win, vars->plr_x, vars->plr_y + 1, 0xFFFFFF);
-	my_mlx_pixel_put(vars, vars->plr_x, vars->plr_y, 0x00FF0000);
-	my_mlx_pixel_put(vars, vars->plr_x + 1, vars->plr_y + 1, 0x00FF0000);
-	my_mlx_pixel_put(vars, vars->plr_x + 1, vars->plr_y, 0x00FF0000);
-	my_mlx_pixel_put(vars, vars->plr_x, vars->plr_y + 1, 0x00FF0000);
-	mlx_put_image_to_window(vars->mlx, vars->win, vars->img_ptr, 0, 0);
+	{
+		vars->plr_x -= cos(vars->x_reycast + M_PI/2);
+		vars->plr_y -= sin(vars->y_reycast + M_PI/2);
+		//vars->plr_x++;
+	}
+	if (keycode == 123)//turn right
+	{
+		vars->x_reycast -= turn;
+		vars->y_reycast -= turn;
+	}
+	if (keycode == 124)//turn left
+	{
+		vars->x_reycast += turn;
+		vars->y_reycast += turn;
+	}
+
+	//printf("position - %f %f\n", vars->plr_x, vars->plr_y);
+	mlx_clear_window(vars->mlx, vars->win);
+	print_map_2d(vars);
 	return (0);
 }
 
 void	move_plr_make_window(t_vars *vars)
 {
-	vars->plr_x = 50;
-	vars->plr_y = 50;
 	vars->width = 1000;
 	vars->hight = 1000;
+	vars->x_reycast = 0;
+	vars->y_reycast = 0;
+	vars->alpha = 0;
+	vars->beta = 0;
 	vars->mlx = mlx_init();
 	//size(vars);
 	//exit(0);
@@ -184,7 +237,7 @@ int main(int argc, char **argv)
 	t_vars vars;
 
 	if (argc == 2)
-		read_map(argc, argv, &vars);
+		read_map(argv, &vars);
 	move_plr_make_window(&vars);
 	return (0);
 }

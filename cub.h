@@ -6,7 +6,7 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/09 19:21:47 by psabreto          #+#    #+#             */
-/*   Updated: 2020/09/17 14:40:02 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/04 16:31:38 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define CUB_H
 
 #define s_map 20
-# define turn M_PI/12
+# define turn 0.05 //M_PI/12 no
 
 #include "minilibx/mlx.h"
 #include "libft/libft.h"
@@ -30,13 +30,12 @@ typedef struct	s_vars {
 	void	*win;
 	void	*img_ptr;
 	char	*img_data;
-	float	plr_x;
-	float	plr_y;
-	float	plr_view;
-	float	x_reycast;
-	float	y_reycast;
-	float	x_line;
-	float	y_line;
+	double	plr_x;
+	double	plr_y;
+	double	x_reycast;
+	double	y_reycast;
+	double	x_line;
+	double	y_line;
 	int		max_map_width;
 	int		max_map_hight;
 	int		width;
@@ -46,9 +45,12 @@ typedef struct	s_vars {
 	int		bpp;
 	int		line_length;
 	int		endian;
-	float	alpha;
-	float	beta;
-	float	dir;
+	double	overview;
+	double 	main_line;
 }				t_vars;
+
+void	read_map(char **argv, t_vars *vars);
+int		key_press(int keycode, t_vars *vars);
+void	print_map_2d(t_vars *vars);
 
 #endif

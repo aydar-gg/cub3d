@@ -6,17 +6,17 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/04 16:28:49 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/04 16:29:57 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/18 17:27:01 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub.h"
 
-void	my_mlx_pixel_put(t_vars *data, int x, int y, int color)
+void	my_mlx_pixel_put(t_vars *vars, int x, int y, int color)
 {
 	char *dst;
 
-	dst = data->img_data + (y * data->line_length + x * (data->bpp / 8));
+	dst = vars->img_data + (y * vars->line_length + x * (vars->bpp / 8));
 	*(unsigned int*)dst = color;
 }
 
@@ -43,7 +43,7 @@ void d2_map(t_vars *vars)
 					h_2 = h;
 					while (h != h_2 + s_map)
 					{
-						my_mlx_pixel_put(vars, h, k, 0x00AAFF00);
+						my_mlx_pixel_put(vars, h, k, 0x000000FF);
 						h++;
 					}
 					h -= s_map;
@@ -58,25 +58,16 @@ void d2_map(t_vars *vars)
 		i++;
 	}
 }
-static void		map_3d(double z, t_vars *vars, float k)
+
+static void		map_3d(t_vars *vars, int k)
 {
 	int h;
 	int i;
 	double test;
-	double over;
 
-	if (k  == 1000 || k == 900 || k == 500)
-		i = 0;
-	//if (vars->overview < vars->x_reycast)
-	//	z = z * sin(M_PI_2 - (vars->x_reycast - vars->overview));//sin(vars->x_reycast - vars->overview);
-	//else
-	//	z = z * sin(M_PI_2 - (vars->overview - vars->x_reycast));//sin(vars->overview - vars->x_reycast);
-	//over = ((int)(vars->overview - vars->x_reycast) == 0) ? vars->x_reycast : vars->overview;
-	test = cos(vars->overview - vars->x_reycast);
-	z = z * cos(vars->overview - vars->x_reycast);
-	h = (vars->hight) / z;
+	h = (vars->hight * s_map) / vars->z;
 	if (h > vars->hight * 2)
-		h = vars->hight * 2;
+		h = vars->hight * 2 - 1;
 	i = 0;
 	while (i <= h / 2)
 	{
@@ -85,57 +76,200 @@ static void		map_3d(double z, t_vars *vars, float k)
 	}
 }
 
-static void find_main_line(t_vars *vars)
+static double		check_over(double over)
 {
-	double z;
+	while (over > 2 * M_PI)
+		over -= 2 * M_PI;
+	while (over < 0)
+		over += 2 * M_PI;
+	return (over);
+}
 
-	z = 0;
-	vars->x_line = vars->plr_x;
-	vars->y_line = vars->plr_y;
-	while ((int)z != 40)
+static void		length_at_horizontlly(t_vars *vars)
+{
+	if (check_over(vars->overview) > M_PI && check_over(vars->overview) < 2 * M_PI)//начальное расстояние по у новый способ если луч идет вверх
 	{
-		vars->x_line += cos(vars->x_reycast);
-		vars->y_line += sin(vars->y_reycast);
-		if (vars->t_map[(int)vars->y_line / s_map][(int)vars->x_line / s_map] == '1')
-		{
-			vars->main_line = sqrt(pow((vars->x_line - vars->plr_x), 2) + pow((vars->y_line - vars->plr_y), 2)) / s_map;
-			break ;
-		}
-		z += 0.1;
+		vars->Hy_ray = (int)(vars->plr_y / s_map) * (s_map) - 0.001;
+		vars->Ya = -s_map;
+	}
+	else//если луч идет вниз
+	{
+		vars->Hy_ray = ((int)vars->plr_y / s_map) * (s_map) + s_map;
+		vars->Ya = s_map;
+	}
+	if (check_over(vars->overview) > M_PI_2 && check_over(vars->overview) < 3 * M_PI_2)//влево по горизонтали
+	{
+		vars->Hx_ray = vars->plr_x + fabs((vars->plr_y - vars->Hy_ray) / tan(vars->overview)) * (-1);
+		vars->Xa = fabs(s_map / tan(vars->overview)) * (-1);
+	}
+	else//вправо по горизонтали
+	{
+		vars->Hx_ray = vars->plr_x + fabs((vars->plr_y - vars->Hy_ray) / tan(vars->overview));
+		vars->Xa = fabs(s_map / tan(vars->overview));
+	}
+	while (vars->Hx_ray < vars->max_map_width * s_map && vars->Hy_ray < vars->max_map_hight * s_map &&
+	 vars->Hy_ray / s_map > 0 && vars->Hx_ray / s_map > 0 &&
+	 vars->t_map[(int)(vars->Hy_ray / s_map)][(int)(vars->Hx_ray / s_map)] != '1')
+	{
+		//my_mlx_pixel_put(vars, vars->Hx_ray, vars->Hy_ray, 0x00FFFFFF);
+		vars->Hx_ray += vars->Xa;
+		vars->Hy_ray += vars->Ya;
+		//printf("Hy_ray = %.2f, Hx_ray = %.2f ", vars->Hy_ray, vars->Hx_ray);
+	}
+	vars->z_horizontlly = sqrt(pow(vars->plr_y - vars->Hy_ray, 2) + pow(vars->plr_x - vars->Hx_ray, 2));
+}
+
+static void		length_at_vertically(t_vars *vars)
+{
+	if (check_over(vars->overview) > M_PI_2 && check_over(vars->overview) < 3 * M_PI_2)//начальное расстояние по х новый способ если луч идет влево
+	{
+		vars->Vx_ray = (int)(vars->plr_x / s_map) * s_map - 0.001;
+		vars->Xa = -s_map;
+	}
+	else//если луч идет вправо
+	{
+		vars->Vx_ray = (int)(vars->plr_x / s_map) * s_map + s_map;
+		vars->Xa = s_map;
+	}
+	if (check_over(vars->overview) > 0 && check_over(vars->overview) < M_PI)// вниз по вертикали
+	{
+		vars->Vy_ray = vars->plr_y + fabs((vars->plr_x - vars->Vx_ray) * tan(vars->overview));
+		vars->Ya = fabs(s_map * tan(vars->overview));
+	}
+	else//вверх по вертикали
+	{
+		vars->Vy_ray = vars->plr_y + fabs((vars->plr_x - vars->Vx_ray) * tan(vars->overview)) * (-1);
+		vars->Ya = fabs(s_map * tan(vars->overview)) * (-1);
+	}
+	while (vars->Vx_ray < vars->max_map_width * s_map && vars->Vy_ray < vars->max_map_hight * s_map
+	&& vars->Vy_ray / s_map > 0 && vars->Vx_ray / s_map > 0 && vars->t_map[(int)(vars->Vy_ray / s_map)][(int)(vars->Vx_ray / s_map)] != '1')
+	{
+		//my_mlx_pixel_put(vars, vars->Vx_ray, vars->Vy_ray, 0x00FFFFFF);
+		vars->Vx_ray += vars->Xa;
+		vars->Vy_ray += vars->Ya;
+		//printf("Vy_ray = %.2f, Vx_ray = %.2f ", vars->Vy_ray, vars->Vx_ray);
+	}
+	vars->z_vertically = sqrt(pow(vars->plr_y - vars->Vy_ray, 2) + pow(vars->plr_x - vars->Vx_ray, 2));
+}
+
+static void right_left(t_vars *vars)
+{
+	vars->Vy_ray = vars->plr_y;
+	vars->Hy_ray = vars->plr_y;
+	if (check_over(vars->overview) > M_PI_2 && check_over(vars->overview) < 3 * M_PI_2)
+	{
+		vars->Vx_ray = (int)(vars->plr_x / s_map) * s_map - 0.001;
+		vars->Xa = -s_map;
+	}
+	else
+	{
+		vars->Vx_ray = (int)(vars->plr_x / s_map) * s_map + s_map;
+		vars->Xa = s_map;
+	}
+	while (vars->t_map[(int)(vars->Vy_ray / s_map)][(int)(vars->Vx_ray / s_map)] != '1')
+	{
+		vars->Vx_ray += vars->Xa;
+		//printf("Vy_ray = %.2f, Vx_ray = %.2f Hy_ray = %.2f, Hx_ray = %.2f ", vars->Vy_ray, vars->Vx_ray, vars->Hy_ray, vars->Hx_ray);
+	}
+	vars->Hx_ray = vars->Vx_ray;
+	vars->z_horizontlly = fabs(vars->Vx_ray - vars->plr_x);
+	vars->z_vertically = fabs(vars->Vx_ray - vars->plr_x);
+}
+
+static void up_down(t_vars *vars)
+{
+	vars->Hx_ray = vars->plr_x;
+	vars->Vx_ray = vars->plr_x;
+	if (check_over(vars->overview) > M_PI && check_over(vars->overview) < 2 * M_PI)
+	{
+		vars->Hy_ray = (int)(vars->plr_y / s_map) * s_map - 0.001;
+		vars->Ya = -s_map;
+	}
+	else
+	{
+		vars->Hy_ray = (int)(vars->plr_y / s_map) * s_map + s_map;
+		vars->Ya = s_map;
+	}
+	while (vars->t_map[(int)(vars->Hy_ray / s_map)][(int)(vars->Hx_ray / s_map)] != '1')
+	{
+		vars->Hy_ray += vars->Ya;
+		//printf("Vy_ray = %.2f, Vx_ray = %.2f Hy_ray = %.2f, Hx_ray = %.2f ", vars->Vy_ray, vars->Vx_ray, vars->Hy_ray, vars->Hx_ray);
+	}
+	vars->Vy_ray = vars->Hy_ray;
+	vars->z_horizontlly = fabs(vars->Hy_ray - vars->plr_y);
+	vars->z_vertically = fabs(vars->Hy_ray - vars->plr_y);
+}
+
+static void		put_z(t_vars *vars)
+{
+	int c;
+
+	c = 0;
+	while (c != vars->z)
+	{
+		my_mlx_pixel_put(vars, vars->plr_x + c * cos(vars->overview),
+		vars->plr_y + c * sin(vars->overview), 0x00FF0000);
+		c++;
 	}
 }
 
 void	print_map_2d(t_vars *vars)	//быстрая рисовка линий
 {
 	int i;
-	double z;
-
-	i = 0;
 
 	vars->img_ptr = mlx_new_image(vars->mlx, vars->width, vars->hight);
 	vars->img_data = mlx_get_data_addr(vars->img_ptr, &vars->bpp, &vars->line_length, &vars->endian);
-	find_main_line(vars);
 	vars->overview = vars->x_reycast - M_PI / 6;
-	d2_map(vars);
-	while (vars->overview <= vars->x_reycast + M_PI / 6)//vars->x_reycast - M_PI / 6 + 2 * ((M_PI / 3) / vars->width))
+	//d2_map(vars);
+	i = 0;
+	while (vars->overview <= vars->x_reycast + M_PI / 6)
 	{
-		vars->x_line = vars->plr_x;
-		vars->y_line = vars->plr_y;
-		z = 0;
-		while ((int)z != 40)
+		//printf("i = %d ", i);
+		if ((int)(check_over(vars->overview) * 1000) == 0 || check_over(vars->overview) == 3.1415926535897962 ||
+		check_over(vars->overview) == 1.5707963267948641 || tan(vars->overview) == 0)
+			right_left(vars);
+		else if (tan(vars->overview) == -2147483648 || (int)(check_over(vars->overview) * 1000) == 4712)
+			up_down(vars);
+		else
 		{
-			vars->x_line += cos(vars->overview);
-			vars->y_line += sin(vars->overview);
-			if (vars->t_map[(int)(round(vars->y_line) / s_map)][(int)(round(vars->x_line) / s_map)] == '1')
-			{
-				map_3d(sqrt(pow((round(vars->x_line) - vars->plr_x), 2) + pow((round(vars->y_line) - vars->plr_y), 2)) / s_map, vars, i);
-				i += 1;
-				break ;
-			}
-			my_mlx_pixel_put(vars, vars->x_line, vars->y_line, 0x00FF0000);
-			z += 0.1;
+			length_at_horizontlly(vars);
+			length_at_vertically(vars);
 		}
+		//my_mlx_pixel_put(vars, vars->plr_x, vars->plr_y, 0x00FFAABB);
+		vars->z = (vars->z_vertically <= vars->z_horizontlly) ? vars->z_vertically : vars->z_horizontlly;
+		vars->z = (vars->z * cos(vars->overview - vars->x_reycast)) ? vars->z * cos(vars->overview - vars->x_reycast) : vars->z;
+		//printf("z_vertically = %d z_horizontlly = %d z = %d\n", vars->z_vertically, vars->z_horizontlly, vars->z);
+		//put_z(vars);
+		map_3d(vars, i);
 		vars->overview += ((M_PI / 3) / vars->width);
+		i++;
 	}
 	mlx_put_image_to_window(vars->mlx, vars->win, vars->img_ptr, 0, 0);
 }
+
+
+//void    draw_column(t_vars *ap, int col_nmb, float step)
+//{
+//    ap->start = -1;
+//    step = step * cos(ap->player_a - ap->angle);
+//    ap->dist_to_pp = (ap->win_x / 2) / tan(M_PI / 6);
+//    ap->wall_size = ap->block_h * ap->dist_to_pp / step;
+//    ap->centre = ap->win_y / 2;
+//    ap->y_h = ap->centre - (ap->wall_size / 2);
+//    if (ap->wall_size > ap->win_y)
+//    {
+//        ap->y_h = 0;
+//        ap->y2 = (ap->wall_size - ap->win_y) / 2;
+//    }
+//    else
+//        ap->y2 = 0;
+//    while (ap->y_h > ++ap->start)
+//        my_mlx_pixel_put(ap, col_nmb, ap->start, ap->ceil);
+//    while (ap->y2 < ap->wall_size && ap->y_h < ap->win_y - 1)
+//        get_color_wall(ap, col_nmb);
+//    while (ap->y_h < ap->win_y - 1)
+//    {
+//        my_mlx_pixel_put(ap, col_nmb, ap->y_h, ap->floor);
+//        ap->y_h++;
+//    }
+//}

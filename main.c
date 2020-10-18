@@ -14,21 +14,21 @@ int		v_test_2(int keycode)
 	//если нажать по х (8-20), по у (5-16), окно закроется
 }
 
-//static void size(t_vars *vars) //определяет размер окна
-//{
-//	int i;
-//	int j;
-//	mlx_get_screen_size(vars->mlx, &i, &j);
-//	printf("%d:%d\n", i, j);
-//}
+static void size(t_vars *vars) //определяет размер окна
+{
+	int i;
+	int j;
+	mlx_get_screen_size(vars->mlx, &i, &j);
+	printf("%d:%d\n", i, j);
+}
 
 
 void	move_plr_make_window(t_vars *vars)
 {
-	vars->width = 1000;
-	vars->hight = 1000;
+	//vars->width = 1920;//2560;
+	//vars->hight = 1000;//1440;
 	vars->mlx = mlx_init();
-	//size(vars);
+	size(vars);
 	//exit(0);
 	vars->win = mlx_new_window(vars->mlx, vars->width, vars->hight, "Test");
 

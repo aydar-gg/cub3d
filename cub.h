@@ -6,15 +6,15 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/09 19:21:47 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/04 16:31:38 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/18 17:27:34 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB_H
 # define CUB_H
 
-#define s_map 20
-# define turn 0.05 //M_PI/12 no
+#define s_map 64
+# define turn 0.05 //M_PI/12no
 
 #include "minilibx/mlx.h"
 #include "libft/libft.h"
@@ -46,7 +46,16 @@ typedef struct	s_vars {
 	int		line_length;
 	int		endian;
 	double	overview;
-	double 	main_line;
+	double	main_line;
+	double	Hy_ray;
+	double	Hx_ray;
+	double	Ya;
+	double	Xa;
+	double	Vy_ray;
+	double	Vx_ray;
+	double	z;
+	double	z_horizontlly;
+	double	z_vertically;
 }				t_vars;
 
 void	read_map(char **argv, t_vars *vars);

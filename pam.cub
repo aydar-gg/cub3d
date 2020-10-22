@@ -1,15 +1,15 @@
 R 1000 1000
-NO ./path_to_the_north_texture
-SO ./path_to_the_south_texture
-WE ./path_to_the_west_texture
-EA ./path_to_the_east_texture
-S ./path_to_the_sprite_texture
+NO ./xpm/tile_to_north.xpm
+SO ./xpm/tile_to_south.xpm
+WE ./xpm/tile_to_west.xpm
+EA ./xpm/tile_to_east.xpm
+S ./xpm/08_green_tree.xpm
 F 220,100,0
 C 225,30,0
-11111111111
-10011110001
-10N00000111
-10011100001
-10001000001
-10000000001
-11111111111
+11111111111111111
+10002000000020001
+10100021000000001
+1W010010002002001
+10100001000000001
+10000000020000001
+11111111111111111

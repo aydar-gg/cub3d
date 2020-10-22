@@ -6,13 +6,22 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/04 16:28:49 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/18 17:27:01 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/22 15:59:23 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub.h"
 
-void	my_mlx_pixel_put(t_vars *vars, int x, int y, int color)
+double	check_over(double over)
+{
+	while (over > 2 * M_PI)
+		over -= 2 * M_PI;
+	while (over < 0)
+		over += 2 * M_PI;
+	return (over);
+}
+
+void		my_mlx_pixel_put(t_vars *vars, int x, int y, int color)
 {
 	char *dst;
 
@@ -20,13 +29,12 @@ void	my_mlx_pixel_put(t_vars *vars, int x, int y, int color)
 	*(unsigned int*)dst = color;
 }
 
-void d2_map(t_vars *vars)
+static void		d2_map(t_vars *vars)
 {
 	int k, k_2;
 	int h, h_2;
 	int i;
 	int l;
-	float z;
 	i = 0;
 	k = 0;
 	while(i != vars->max_map_hight)
@@ -35,54 +43,31 @@ void d2_map(t_vars *vars)
 		h = 0;
 		while (vars->t_map[i][l] != '\n' && vars->t_map[i][l] != '\0')
 		{
-			if (vars->t_map[i][l] == '1')
+			if (vars->t_map[i][l] != '0')
 			{
 				k_2 = k;
-				while (k != k_2 + s_map)
+				while (k != k_2 + s_map / 4)
 				{
 					h_2 = h;
-					while (h != h_2 + s_map)
+					while (h != h_2 + s_map / 4)
 					{
-						my_mlx_pixel_put(vars, h, k, 0x000000FF);
+						if (vars->t_map[i][l] == '1')
+							my_mlx_pixel_put(vars, h, k, 0x000000FF);
+						else if (vars->t_map[i][l] == '2')
+							my_mlx_pixel_put(vars, h, k, 0x0000AAAA);
 						h++;
 					}
-					h -= s_map;
+					h -= s_map / 4;
 					k++;
 				}
-				k -= s_map;
+				k -= s_map / 4;
 			}
-				h += s_map;
+				h += s_map / 4;
 			l++;
 		}
-		k += s_map;
+		k += s_map / 4;
 		i++;
 	}
-}
-
-static void		map_3d(t_vars *vars, int k)
-{
-	int h;
-	int i;
-	double test;
-
-	h = (vars->hight * s_map) / vars->z;
-	if (h > vars->hight * 2)
-		h = vars->hight * 2 - 1;
-	i = 0;
-	while (i <= h / 2)
-	{
-		my_mlx_pixel_put(vars, k, vars->hight / 2 - h / 4 + i, 0x00AAFFAA);
-		i += 1;
-	}
-}
-
-static double		check_over(double over)
-{
-	while (over > 2 * M_PI)
-		over -= 2 * M_PI;
-	while (over < 0)
-		over += 2 * M_PI;
-	return (over);
 }
 
 static void		length_at_horizontlly(t_vars *vars)
@@ -111,10 +96,10 @@ static void		length_at_horizontlly(t_vars *vars)
 	 vars->Hy_ray / s_map > 0 && vars->Hx_ray / s_map > 0 &&
 	 vars->t_map[(int)(vars->Hy_ray / s_map)][(int)(vars->Hx_ray / s_map)] != '1')
 	{
-		//my_mlx_pixel_put(vars, vars->Hx_ray, vars->Hy_ray, 0x00FFFFFF);
+		if (vars->t_map[(int)(vars->Hy_ray / s_map)][(int)(vars->Hx_ray / s_map)] == '2')
+			vars->z_sprit_h = sqrt(pow(vars->plr_y - vars->Hy_ray, 2) + pow(vars->plr_x - vars->Hx_ray, 2));
 		vars->Hx_ray += vars->Xa;
 		vars->Hy_ray += vars->Ya;
-		//printf("Hy_ray = %.2f, Hx_ray = %.2f ", vars->Hy_ray, vars->Hx_ray);
 	}
 	vars->z_horizontlly = sqrt(pow(vars->plr_y - vars->Hy_ray, 2) + pow(vars->plr_x - vars->Hx_ray, 2));
 }
@@ -144,106 +129,135 @@ static void		length_at_vertically(t_vars *vars)
 	while (vars->Vx_ray < vars->max_map_width * s_map && vars->Vy_ray < vars->max_map_hight * s_map
 	&& vars->Vy_ray / s_map > 0 && vars->Vx_ray / s_map > 0 && vars->t_map[(int)(vars->Vy_ray / s_map)][(int)(vars->Vx_ray / s_map)] != '1')
 	{
-		//my_mlx_pixel_put(vars, vars->Vx_ray, vars->Vy_ray, 0x00FFFFFF);
+		if (vars->t_map[(int)(vars->Vy_ray / s_map)][(int)(vars->Vx_ray / s_map)] == '2')
+			vars->z_sprit_v = sqrt(pow(vars->plr_y - vars->Vy_ray, 2) + pow(vars->plr_x - vars->Vx_ray, 2));
 		vars->Vx_ray += vars->Xa;
 		vars->Vy_ray += vars->Ya;
-		//printf("Vy_ray = %.2f, Vx_ray = %.2f ", vars->Vy_ray, vars->Vx_ray);
 	}
 	vars->z_vertically = sqrt(pow(vars->plr_y - vars->Vy_ray, 2) + pow(vars->plr_x - vars->Vx_ray, 2));
 }
 
-static void right_left(t_vars *vars)
-{
-	vars->Vy_ray = vars->plr_y;
-	vars->Hy_ray = vars->plr_y;
-	if (check_over(vars->overview) > M_PI_2 && check_over(vars->overview) < 3 * M_PI_2)
-	{
-		vars->Vx_ray = (int)(vars->plr_x / s_map) * s_map - 0.001;
-		vars->Xa = -s_map;
-	}
-	else
-	{
-		vars->Vx_ray = (int)(vars->plr_x / s_map) * s_map + s_map;
-		vars->Xa = s_map;
-	}
-	while (vars->t_map[(int)(vars->Vy_ray / s_map)][(int)(vars->Vx_ray / s_map)] != '1')
-	{
-		vars->Vx_ray += vars->Xa;
-		//printf("Vy_ray = %.2f, Vx_ray = %.2f Hy_ray = %.2f, Hx_ray = %.2f ", vars->Vy_ray, vars->Vx_ray, vars->Hy_ray, vars->Hx_ray);
-	}
-	vars->Hx_ray = vars->Vx_ray;
-	vars->z_horizontlly = fabs(vars->Vx_ray - vars->plr_x);
-	vars->z_vertically = fabs(vars->Vx_ray - vars->plr_x);
-}
+//static void right_left(t_vars *vars)
+//{
+//	vars->Vy_ray = vars->plr_y;
+//	vars->Hy_ray = vars->plr_y;
+//	if (check_over(vars->overview) > M_PI_2 && check_over(vars->overview) < 3 * M_PI_2)
+//	{
+//		vars->Vx_ray = (int)(vars->plr_x / s_map) * s_map - 0.001;
+//		vars->Xa = -s_map;
+//	}
+//	else
+//	{
+//		vars->Vx_ray = (int)(vars->plr_x / s_map) * s_map + s_map;
+//		vars->Xa = s_map;
+//	}
+//	while (vars->t_map[(int)(vars->Vy_ray / s_map)][(int)(vars->Vx_ray / s_map)] != '1')
+//		vars->Vx_ray += vars->Xa;
+//	vars->Hx_ray = vars->Vx_ray;
+//	vars->z_horizontlly = fabs(vars->Vx_ray - vars->plr_x);
+//	vars->z_vertically = fabs(vars->Vx_ray - vars->plr_x);
+//}
 
-static void up_down(t_vars *vars)
-{
-	vars->Hx_ray = vars->plr_x;
-	vars->Vx_ray = vars->plr_x;
-	if (check_over(vars->overview) > M_PI && check_over(vars->overview) < 2 * M_PI)
-	{
-		vars->Hy_ray = (int)(vars->plr_y / s_map) * s_map - 0.001;
-		vars->Ya = -s_map;
-	}
-	else
-	{
-		vars->Hy_ray = (int)(vars->plr_y / s_map) * s_map + s_map;
-		vars->Ya = s_map;
-	}
-	while (vars->t_map[(int)(vars->Hy_ray / s_map)][(int)(vars->Hx_ray / s_map)] != '1')
-	{
-		vars->Hy_ray += vars->Ya;
-		//printf("Vy_ray = %.2f, Vx_ray = %.2f Hy_ray = %.2f, Hx_ray = %.2f ", vars->Vy_ray, vars->Vx_ray, vars->Hy_ray, vars->Hx_ray);
-	}
-	vars->Vy_ray = vars->Hy_ray;
-	vars->z_horizontlly = fabs(vars->Hy_ray - vars->plr_y);
-	vars->z_vertically = fabs(vars->Hy_ray - vars->plr_y);
-}
+//static void up_down(t_vars *vars)
+//{
+//	vars->Hx_ray = vars->plr_x;
+//	vars->Vx_ray = vars->plr_x;
+//	if (check_over(vars->overview) > M_PI && check_over(vars->overview) < 2 * M_PI)
+//	{
+//		vars->Hy_ray = (int)(vars->plr_y / s_map) * s_map - 0.001;
+//		vars->Ya = -s_map;
+//	}
+//	else
+//	{
+//		vars->Hy_ray = (int)(vars->plr_y / s_map) * s_map + s_map;
+//		vars->Ya = s_map;
+//	}
+//	while (vars->t_map[(int)(vars->Hy_ray / s_map)][(int)(vars->Hx_ray / s_map)] != '1')
+//		vars->Hy_ray += vars->Ya;
+//	vars->Vy_ray = vars->Hy_ray;
+//	vars->z_horizontlly = fabs(vars->Hy_ray - vars->plr_y);
+//	vars->z_vertically = fabs(vars->Hy_ray - vars->plr_y);
+//}
 
 static void		put_z(t_vars *vars)
 {
 	int c;
 
 	c = 0;
-	while (c != vars->z)
+	while (c != (int)(vars->z / 4))
 	{
-		my_mlx_pixel_put(vars, vars->plr_x + c * cos(vars->overview),
-		vars->plr_y + c * sin(vars->overview), 0x00FF0000);
+		my_mlx_pixel_put(vars, vars->plr_x / 4 + c * cos(vars->overview),
+		vars->plr_y / 4 + c * sin(vars->overview), 0x00FF0000);
 		c++;
 	}
 }
 
-void	print_map_2d(t_vars *vars)	//быстрая рисовка линий
+static void		print_floor_ceiling(t_vars *vars)
+{
+	int i;
+	int k;
+
+	i = 0;
+	while (i != vars->width)
+	{
+		k = vars->hight / 2;
+		while (k != vars->hight)
+		{
+			my_mlx_pixel_put(vars, i, k, 600);
+			k++;
+		}
+		i++;
+	}
+	i = 0;
+	while (i != vars->width)
+	{
+		k = 0;
+		while (k != vars->hight / 2)
+		{
+			my_mlx_pixel_put(vars, i, k, 14);
+			k++;
+		}
+		i++;
+	}
+}
+
+void			print_map_2d(t_vars *vars)	//быстрая рисовка линий
 {
 	int i;
 
 	vars->img_ptr = mlx_new_image(vars->mlx, vars->width, vars->hight);
 	vars->img_data = mlx_get_data_addr(vars->img_ptr, &vars->bpp, &vars->line_length, &vars->endian);
 	vars->overview = vars->x_reycast - M_PI / 6;
-	//d2_map(vars);
+	print_floor_ceiling(vars);
 	i = 0;
 	while (vars->overview <= vars->x_reycast + M_PI / 6)
 	{
-		//printf("i = %d ", i);
-		if ((int)(check_over(vars->overview) * 1000) == 0 || check_over(vars->overview) == 3.1415926535897962 ||
-		check_over(vars->overview) == 1.5707963267948641 || tan(vars->overview) == 0)
-			right_left(vars);
-		else if (tan(vars->overview) == -2147483648 || (int)(check_over(vars->overview) * 1000) == 4712)
-			up_down(vars);
-		else
-		{
-			length_at_horizontlly(vars);
-			length_at_vertically(vars);
-		}
-		//my_mlx_pixel_put(vars, vars->plr_x, vars->plr_y, 0x00FFAABB);
+		//if ((int)(check_over(vars->overview) * 1000) == 0 || check_over(vars->overview) == 3.1415926535897962 ||
+		//check_over(vars->overview) == 1.5707963267948641 || tan(vars->overview) == 0)
+		//	right_left(vars);
+		//else if (tan(vars->overview) == -2147483648 || (int)(check_over(vars->overview) * 1000) == 4712)
+		//	up_down(vars);
+		//else
+		//{
+		length_at_horizontlly(vars);
+		length_at_vertically(vars);
+		//}
 		vars->z = (vars->z_vertically <= vars->z_horizontlly) ? vars->z_vertically : vars->z_horizontlly;
-		vars->z = (vars->z * cos(vars->overview - vars->x_reycast)) ? vars->z * cos(vars->overview - vars->x_reycast) : vars->z;
-		//printf("z_vertically = %d z_horizontlly = %d z = %d\n", vars->z_vertically, vars->z_horizontlly, vars->z);
-		//put_z(vars);
+		vars->offset = (vars->z_vertically <= vars->z_horizontlly) ? (int)vars->Vy_ray % s_map : (int)vars->Hx_ray % s_map;
 		map_3d(vars, i);
+		if ((int)vars->z_sprit_h || (int)vars->z_sprit_v)
+		{
+			vars->z_sprit = (vars->z_sprit_v <= vars->z_sprit_h) ? vars->z_sprit_v : vars->z_sprit_h;
+			vars->offset_sprit = (vars->z_sprit_v <= vars->z_sprit_h) ? (int)vars->z_sprit_v % s_map : (int)vars->z_sprit_h % s_map;
+			print_sprit(vars, i);
+			vars->z_sprit_h = 0;
+			vars->z_sprit_v = 0;
+		}
+		put_z(vars);
 		vars->overview += ((M_PI / 3) / vars->width);
 		i++;
 	}
+	d2_map(vars);
 	mlx_put_image_to_window(vars->mlx, vars->win, vars->img_ptr, 0, 0);
 }
 

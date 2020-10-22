@@ -6,7 +6,7 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/04 17:11:22 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/15 19:57:11 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/22 14:49:25 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,9 @@ void	read_map(char **argv, t_vars *vars)
 	t_list *str_map;
 	vars->max_map_hight = 0;
 	vars->max_map_width = 0;
+	int bpp;
+	int line_length;
+	int endian;
 
 	str_map = NULL;
 	line = NULL;
@@ -83,35 +86,37 @@ void	read_map(char **argv, t_vars *vars)
 		{
 			vars->width = ft_atoi(&line[2]);
 			vars->hight = ft_atoi(&line[3 + num_width(vars->width)]);
-			int R = 1;
 		}
 		else if (ft_strnstr(line, "NO .", 5))
 		{
-			int NO = 1;
+			vars->no.north = mlx_xpm_file_to_image(vars->mlx, ft_strchr(line, '.'), &vars->no.width, &vars->no.hight);
+			vars->no.addr = (int*)mlx_get_data_addr(vars->no.north, &(bpp), &(line_length), &(endian));
 		}
 		else if (ft_strnstr(line, "SO .", 5))
 		{
-			int SO = 1;
+			vars->so.south = mlx_xpm_file_to_image(vars->mlx, ft_strchr(line, '.'), &vars->so.width, &vars->so.hight);
+			vars->so.addr = (int*)mlx_get_data_addr(vars->so.south, &(vars->so.bpp), &(vars->so.line_length), &(vars->so.endian));
 		}
 		else if (ft_strnstr(line, "WE .", 5))
 		{
-			int WE = 1;
+			vars->we.west = mlx_xpm_file_to_image(vars->mlx, ft_strchr(line, '.'), &vars->we.width, &vars->we.hight);
+			vars->we.addr = (int*)mlx_get_data_addr(vars->we.west, &(vars->we.bpp), &(vars->we.line_length), &(vars->we.endian));
 		}
 		else if (ft_strnstr(line, "EA .", 5))
 		{
-			int EA = 1;
+			vars->ea.east = mlx_xpm_file_to_image(vars->mlx, ft_strchr(line, '.'), &vars->ea.width, &vars->ea.hight);
+			vars->ea.addr = (int*)mlx_get_data_addr(vars->ea.east, &(vars->ea.bpp), &(vars->ea.line_length), &(vars->ea.endian));
 		}
 		else if (ft_strnstr(line, "S .", 4))
 		{
-			int S = 1;
+			vars->sp.sprit = mlx_xpm_file_to_image(vars->mlx, ft_strchr(line, '.'), &vars->sp.width, &vars->sp.hight);
+			vars->sp.addr = (int*)mlx_get_data_addr(vars->sp.sprit, &(vars->sp.bpp), &(vars->sp.line_length), &(vars->sp.endian));
 		}
 		else if (ft_strnstr(line, "F", 2))
 		{
-			int F = 1;
 		}
 		else if (ft_strnstr(line, "C", 2))
 		{
-			int C = 1;
 		}
 		else
 		{

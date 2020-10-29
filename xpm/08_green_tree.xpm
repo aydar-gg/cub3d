@@ -110,9 +110,9 @@ static char *result[] = {
 "pppppppppppppppppppppppppefzzuzuurwr00w0*&%ppppppppppppppppppppp",
 "pppppppppppppppppppppppppteq0**&&&%%%%%%%%%ppppppppppppppppppppp",
 "ppppppppppppppppppppppppptgyreqq0**&&&&&&&%ppppppppppppppppppppp",
-"ppppppppppppppppppppppppptgkzguttrrw0****&%ppp;pp;;p;;pppppppppp",
-"ppppppppppppppppppppppppptgkfguttrrww0*0*&%====-----;;;p;ppppppp",
-"ppppppppppppppppppppppppptgkiguttrrww0*0*&%.XXXXXXXX=--;p;pppppp",
-"pppppppppppppppppppppppppptkyguttrrww0*0&%  .......XX==-;;;ppppp",
-"pppppppppppppppppppppppppppttttrrrww0***%.......XXXX==-;pppppppp"
+"ppppppppppppppppppppppppptgkzguttrrw0****&%ppppppppppppppppppppp",
+"ppppppppppppppppppppppppptgkfguttrrww0*0*&%ppppppppppppppppppppp",
+"ppppppppppppppppppppppppptgkiguttrrww0*0*&%ppppppppppppppppppppp",
+"pppppppppppppppppppppppppptkyguttrrww0*0&%pppppppppppppppppppppp",
+"pppppppppppppppppppppppppppttttrrrww0***%ppppppppppppppppppppppp"
 };

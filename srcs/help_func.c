@@ -6,11 +6,11 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 22:12:45 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/29 19:51:54 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/30 15:35:31 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub.h"
+#include "../cub.h"
 
 int		check_space(char *line, t_vars *vars)
 {
@@ -28,8 +28,9 @@ int		check_space(char *line, t_vars *vars)
 
 int		num_width(int num)
 {
-	int i = 0;
+	int i;
 
+	i = 0;
 	if (num == 0)
 		i++;
 	while (num != 0)

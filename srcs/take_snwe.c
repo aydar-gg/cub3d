@@ -6,11 +6,11 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 22:08:12 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/29 19:53:33 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/30 16:28:56 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub.h"
+#include "../cub.h"
 
 int		read_map_part_no(t_vars *vars, char *line)
 {
@@ -32,7 +32,7 @@ int		read_map_part_so(t_vars *vars, char *line)
 {
 	if (ft_strnstr(line, "SO ", 4))
 	{
-		check_space(ft_strnstr(line, "SO ", 4)+ 2, vars);
+		check_space(ft_strnstr(line, "SO ", 4) + 2, vars);
 		if (!(vars->so.south = mlx_xpm_file_to_image(vars->mlx,
 		ft_strchr(line, '.'), &vars->so.width, &vars->so.hight)))
 			ft_error(2, vars);

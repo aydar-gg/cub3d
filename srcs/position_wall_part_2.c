@@ -6,11 +6,11 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/29 20:15:09 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/29 20:32:29 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/30 16:51:15 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub.h"
+#include "../cub.h"
 
 void	d2_map_part_3(char c, t_vars *vars, int k, int h)
 {
@@ -18,18 +18,18 @@ void	d2_map_part_3(char c, t_vars *vars, int k, int h)
 	int h_2;
 
 	k_2 = k;
-	while (k != k_2 + s_map / 4)
+	while (k != k_2 + S_MAP / 4)
 	{
 		h_2 = h;
-		while (h != h_2 + s_map / 4)
+		while (h != h_2 + S_MAP / 4)
 		{
 			if (c == '1')
 				my_mlx_pixel_put(vars, h, k, 0x000000FF);
-			else if (c == '2' && h < h_2 + s_map / 8 && k < k_2 + s_map / 8)
+			else if (c == '2' && h < h_2 + S_MAP / 8 && k < k_2 + S_MAP / 8)
 				my_mlx_pixel_put(vars, h, k, 0x0000AAAA);
 			h++;
 		}
-		h -= s_map / 4;
+		h -= S_MAP / 4;
 		k++;
 	}
 }
@@ -49,7 +49,7 @@ void	d2_map_part_2(t_vars *vars, int i, int k, int h)
 		{
 			d2_map_part_3(vars->t_map[i][l], vars, k, h);
 		}
-		h += s_map / 4;
+		h += S_MAP / 4;
 		l++;
 	}
 }
@@ -62,11 +62,11 @@ void	d2_map(t_vars *vars)
 
 	i = 0;
 	k = 0;
-	while(i != vars->max_map_hight)
+	while (i != vars->max_map_hight)
 	{
 		h = 0;
 		d2_map_part_2(vars, i, k, h);
-		k += s_map / 4;
+		k += S_MAP / 4;
 		i++;
 	}
 }

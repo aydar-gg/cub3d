@@ -6,13 +6,13 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 22:10:02 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/29 20:06:19 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/30 16:23:41 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub.h"
+#include "../cub.h"
 
-int		read_map_part_FC(t_vars *vars, char *line)
+int		read_map_part_fc(t_vars *vars, char *line)
 {
 	if (ft_strnstr(line, "F ", 3))
 	{
@@ -29,7 +29,7 @@ int		read_map_part_FC(t_vars *vars, char *line)
 	return (0);
 }
 
-int		read_map_part_R(t_vars *vars, char *line, int i)
+int		read_map_part_r(t_vars *vars, char *line, int i)
 {
 	if (ft_strnstr(line, "R", 2))
 	{
@@ -72,4 +72,3 @@ int		count_of_map(t_vars *vars, char *line, t_list **str_map)
 	}
 	return (0);
 }
-

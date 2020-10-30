@@ -6,11 +6,11 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/29 12:29:22 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/29 19:54:33 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/30 16:28:14 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub.h"
+#include "../cub.h"
 
 void	check_zero_one_part_2(t_vars *vars, int k, int i)
 {
@@ -66,7 +66,7 @@ void	check_zero_one(t_vars *vars, int k, int i)
 
 void	check_symbol(char c, int *wesn, t_vars *vars)
 {
-	if (c != '1' && c != '0' && c != '2' && c != 'W'&& c != 'N'
+	if (c != '1' && c != '0' && c != '2' && c != 'W' && c != 'N'
 	&& c != 'S' && c != 'E' && c != ' ')
 		ft_error(4, vars);
 	if (c == 'W' || c == 'N' || c == 'S' || c == 'E')

@@ -6,11 +6,11 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 22:28:04 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/29 20:02:33 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/29 22:03:24 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub.h"
+#include "../cub.h"
 
 int		create_rgb(t_vars *ap)
 {

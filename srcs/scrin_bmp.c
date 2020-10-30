@@ -6,11 +6,11 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/29 20:40:44 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/29 20:41:36 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/29 22:03:21 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub.h"
+#include "../cub.h"
 
 void	get_scrin_part_2(t_vars *vars, int32_t num, char *bmp)
 {

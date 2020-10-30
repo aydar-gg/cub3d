@@ -6,13 +6,13 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 20:52:00 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/29 19:51:16 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/30 16:11:10 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub.h"
+#include "../cub.h"
 
-static void size(t_vars *vars)
+static void		size(t_vars *vars)
 {
 	mlx_get_screen_size(vars->mlx, &vars->w_mon, &vars->h_mon);
 	if (vars->h_mon < vars->hight)
@@ -25,18 +25,17 @@ static void size(t_vars *vars)
 		vars->width = 50;
 }
 
-
-void	move_plr_make_window(t_vars *vars)
+static void		move_plr_make_window(t_vars *vars)
 {
 	size(vars);
 	vars->win = mlx_new_window(vars->mlx, vars->width, vars->hight, "Test");
 	print_map_2d(vars);
-	mlx_hook(vars->win, 3, 1L<<2, v_test_2, vars);
+	mlx_hook(vars->win, 3, 1L << 2, v_test_2, vars);
 	mlx_hook(vars->win, 2, 0, key_press, vars);
 	mlx_hook(vars->win, 17, 0L, ft_exit, vars);
 }
 
-int check_argv(char *argv)
+static int		check_argv(char *argv)
 {
 	int i;
 
@@ -46,7 +45,7 @@ int check_argv(char *argv)
 	return (0);
 }
 
-int main(int argc, char **argv)
+int				main(int argc, char **argv)
 {
 	t_vars vars;
 

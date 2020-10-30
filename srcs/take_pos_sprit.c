@@ -6,13 +6,13 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/24 14:32:32 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/29 20:09:58 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/30 16:51:15 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub.h"
+#include "../cub.h"
 
-t_sprite	*ft_lstlast_sp(t_sprite *lst)
+static t_sprite		*ft_lstlast_sp(t_sprite *lst)
 {
 	if (!lst)
 		return (NULL);
@@ -21,7 +21,7 @@ t_sprite	*ft_lstlast_sp(t_sprite *lst)
 	return (lst);
 }
 
-void		ft_lstadd_back_sp(t_sprite **lst, t_sprite *new)
+static void			ft_lstadd_back_sp(t_sprite **lst, t_sprite *new)
 {
 	t_sprite *copy;
 
@@ -37,20 +37,20 @@ void		ft_lstadd_back_sp(t_sprite **lst, t_sprite *new)
 	}
 }
 
-void		no_place(t_vars *vars, t_sprite *new, int i, int k)
+static void			no_place(t_vars *vars, t_sprite *new, int i, int k)
 {
 	if (!(new = (t_sprite*)malloc(sizeof(t_sprite))))
 		ft_error(1, vars);
 	new->y = i;
 	new->x = k;
-	new->y_3d = i * s_map + s_map / 2;
-	new->x_3d = k * s_map + s_map / 2;
+	new->y_3d = i * S_MAP + S_MAP / 2;
+	new->x_3d = k * S_MAP + S_MAP / 2;
 	new->next = NULL;
 	ft_lstadd_back_sp(&vars->sprit, new);
 	vars->count_sp++;
 }
 
-void			take_map_sprit(t_vars *vars)
+void				take_map_sprit(t_vars *vars)
 {
 	int			i;
 	int			k;
@@ -63,7 +63,7 @@ void			take_map_sprit(t_vars *vars)
 	while (i != vars->max_map_hight)
 	{
 		k = 0;
-		while(vars->t_map[i][k] != '\0')
+		while (vars->t_map[i][k] != '\0')
 		{
 			if (vars->t_map[i][k] == '2')
 				no_place(vars, new, i, k);

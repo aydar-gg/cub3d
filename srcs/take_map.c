@@ -6,11 +6,11 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/04 17:11:22 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/29 20:05:45 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/30 16:51:15 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub.h"
+#include "../cub.h"
 
 static void		where_plr(t_vars *vars, int i)
 {
@@ -24,32 +24,32 @@ static void		where_plr(t_vars *vars, int i)
 	(ft_strchr(vars->t_map[i], 'W')) ? (vars->y_reycast = M_PI) : 0;
 }
 
-void	take_coord_plr(t_vars *vars, int i)
+static void		take_coord_plr(t_vars *vars, int i)
 {
 	if (ft_strchr(vars->t_map[i], 'N') || ft_strchr(vars->t_map[i], 'S') || \
 	ft_strchr(vars->t_map[i], 'E') || ft_strchr(vars->t_map[i], 'W'))
 	{
-		vars->plr_y = i * s_map + s_map / 2;
+		vars->plr_y = i * S_MAP + S_MAP / 2;
 		vars->plr_x = (ft_strchr(vars->t_map[i], 'S')) ?
 		(ft_strlen(vars->t_map[i]) - ft_strlen(ft_strchr(vars->t_map[i],
-		'S'))) * s_map + s_map / 2 : vars->plr_x;
+		'S'))) * S_MAP + S_MAP / 2 : vars->plr_x;
 		vars->plr_x = (ft_strchr(vars->t_map[i], 'N')) ?
 		(ft_strlen(vars->t_map[i]) - ft_strlen(ft_strchr(vars->t_map[i],
-		'N'))) * s_map + s_map / 2 : vars->plr_x;
+		'N'))) * S_MAP + S_MAP / 2 : vars->plr_x;
 		vars->plr_x = (ft_strchr(vars->t_map[i], 'W')) ?
 		(ft_strlen(vars->t_map[i]) - ft_strlen(ft_strchr(vars->t_map[i],
-		'W'))) * s_map + s_map / 2 : vars->plr_x;
+		'W'))) * S_MAP + S_MAP / 2 : vars->plr_x;
 		vars->plr_x = (ft_strchr(vars->t_map[i], 'E')) ?
 		(ft_strlen(vars->t_map[i]) - ft_strlen(ft_strchr(vars->t_map[i],
-		'E'))) * s_map + s_map / 2 : vars->plr_x;
+		'E'))) * S_MAP + S_MAP / 2 : vars->plr_x;
 		where_plr(vars, i);
 	}
 }
 
-void	make_map(t_list **str_map, int size, t_vars *vars)
+static void		make_map(t_list **str_map, int size, t_vars *vars)
 {
-	t_list *tmp;
-	int i;
+	t_list	*tmp;
+	int		i;
 
 	i = 0;
 	tmp = *str_map;
@@ -70,15 +70,15 @@ void	make_map(t_list **str_map, int size, t_vars *vars)
 	check_map(vars);
 }
 
-void	count_while(t_vars *vars, char *line, t_list *str_map)
+static void		count_while(t_vars *vars, char *line, t_list *str_map)
 {
 	while (get_next_line(vars->fd, &line) > 0)
 	{
-		if (read_map_part_R(vars, line, 0))
+		if (read_map_part_r(vars, line, 0))
 			free(line);
 		else if (read_map_part_we(vars, line))
 			free(line);
-		else if (read_map_part_FC(vars, line))
+		else if (read_map_part_fc(vars, line))
 			free(line);
 		else if (count_of_map(vars, line, &str_map))
 			continue ;
@@ -94,12 +94,10 @@ void	count_while(t_vars *vars, char *line, t_list *str_map)
 	make_map(&str_map, ft_lstsize(str_map), vars);
 }
 
-void	read_map(char **argv, t_vars *vars)
+void			read_map(char **argv, t_vars *vars)
 {
-	char *line;
-	t_list *str_map;
-	vars->max_map_hight = 0;
-	vars->max_map_width = 0;
+	char	*line;
+	t_list	*str_map;
 
 	str_map = NULL;
 	line = NULL;

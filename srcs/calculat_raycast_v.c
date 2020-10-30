@@ -6,18 +6,18 @@
 /*   By: psabreto <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/29 20:43:08 by psabreto          #+#    #+#             */
-/*   Updated: 2020/10/29 21:20:44 by psabreto         ###   ########.fr       */
+/*   Updated: 2020/10/30 16:55:26 by psabreto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub.h"
+#include "../cub.h"
 
-void	v_sp_v_2(t_vars *vars, t_sprite *copy_sp)
+static void		v_sp_v_2(t_vars *vars, t_sprite *copy_sp)
 {
-	if (((int)(vars->Vy_ray / s_map) == copy_sp->y &&
-	(int)(vars->Vx_ray / s_map) == copy_sp->x) ||
-	((int)(vars->plr_y / s_map) == copy_sp->y &&
-	(int)(vars->plr_x / s_map) == copy_sp->x))
+	if (((int)(vars->vy_ray / S_MAP) == copy_sp->y &&
+	(int)(vars->vx_ray / S_MAP) == copy_sp->x) ||
+	((int)(vars->plr_y / S_MAP) == copy_sp->y &&
+	(int)(vars->plr_x / S_MAP) == copy_sp->x))
 	{
 		copy_sp->flag = 1;
 		copy_sp->z_sp = sqrt(pow(vars->plr_x - copy_sp->x_3d, 2)
@@ -26,64 +26,71 @@ void	v_sp_v_2(t_vars *vars, t_sprite *copy_sp)
 	}
 }
 
-void	visible_sp_v(t_vars *vars)
+static void		visible_sp_v(t_vars *vars)
 {
 	t_sprite	*copy_sp;
 
-	while (vars->Vx_ray < vars->max_map_width * s_map &&
-	vars->Vy_ray < vars->max_map_hight * s_map
-	&& vars->Vy_ray / s_map > 0 && vars->Vx_ray / s_map > 0)
+	while (vars->vx_ray < vars->max_map_width * S_MAP &&
+	vars->vy_ray < vars->max_map_hight * S_MAP
+	&& vars->vy_ray / S_MAP > 0 && vars->vx_ray / S_MAP > 0)
 	{
-		if (vars->t_map[(int)(vars->Vy_ray / s_map)][((int)vars->Vx_ray
-		/ s_map)] == '2' || vars->t_map[(int)(vars->plr_y / s_map)]
-		[(int)(vars->plr_x / s_map)] == '2')
+		if (vars->t_map[(int)(vars->vy_ray / S_MAP)][((int)vars->vx_ray
+		/ S_MAP)] == '2' || vars->t_map[(int)(vars->plr_y / S_MAP)]
+		[(int)(vars->plr_x / S_MAP)] == '2')
 		{
 			copy_sp = vars->sprit;
-			while (copy_sp!= NULL)
+			while (copy_sp != NULL)
 			{
 				v_sp_v_2(vars, copy_sp);
 				copy_sp = copy_sp->next;
 			}
 		}
-		vars->Vx_ray += vars->Xa;
-		vars->Vy_ray += vars->Ya;
+		vars->vx_ray += vars->xa;
+		vars->vy_ray += vars->ya;
 	}
 }
 
-void			take_change_v(t_vars *vars)
+static void		take_change_v(t_vars *vars)
 {
-	if (check_over(vars->overview) > M_PI_2 && check_over(vars->overview) < 3 * M_PI_2)//начальное расстояние по х новый способ если луч идет влево
+	if (check_over(vars->overview) > M_PI_2 && check_over(vars->overview)
+	< 3 * M_PI_2)
 	{
-		vars->Vx_ray = (int)(vars->plr_x / s_map) * s_map - 0.001;
-		vars->Xa = -s_map;
+		vars->vx_ray = (int)(vars->plr_x / S_MAP) * S_MAP - 0.001;
+		vars->xa = -S_MAP;
 	}
-	else//если луч идет вправо
+	else
 	{
-		vars->Vx_ray = (int)(vars->plr_x / s_map) * s_map + s_map;
-		vars->Xa = s_map;
+		vars->vx_ray = (int)(vars->plr_x / S_MAP) * S_MAP + S_MAP;
+		vars->xa = S_MAP;
 	}
-	if (check_over(vars->overview) > 0 && check_over(vars->overview) < M_PI)// вниз по вертикали
+	if (check_over(vars->overview) > 0 && check_over(vars->overview) < M_PI)
 	{
-		vars->Vy_ray = vars->plr_y + fabs((vars->plr_x - vars->Vx_ray) * tan(vars->overview));
-		vars->Ya = fabs(s_map * tan(vars->overview));
+		vars->vy_ray = vars->plr_y + fabs((vars->plr_x - vars->vx_ray)
+		* tan(vars->overview));
+		vars->ya = fabs(S_MAP * tan(vars->overview));
 	}
-	else//вверх по вертикали
+	else
 	{
-		vars->Vy_ray = vars->plr_y + fabs((vars->plr_x - vars->Vx_ray) * tan(vars->overview)) * (-1);
-		vars->Ya = fabs(s_map * tan(vars->overview)) * (-1);
+		vars->vy_ray = vars->plr_y + fabs((vars->plr_x - vars->vx_ray)
+		* tan(vars->overview)) * (-1);
+		vars->ya = fabs(S_MAP * tan(vars->overview)) * (-1);
 	}
 }
 
-void		length_at_vertically(t_vars *vars)
+void			length_at_vertically(t_vars *vars)
 {
 	take_change_v(vars);
 	visible_sp_v(vars);
 	take_change_v(vars);
-	while (vars->Vx_ray < vars->max_map_width * s_map && vars->Vy_ray < vars->max_map_hight * s_map
-	&& vars->Vy_ray / s_map > 0 && vars->Vx_ray / s_map > 0 && vars->t_map[(int)(vars->Vy_ray / s_map)][(int)(vars->Vx_ray / s_map)] != '1')
+	while (vars->vx_ray < vars->max_map_width * S_MAP &&
+	vars->vy_ray < vars->max_map_hight * S_MAP
+	&& vars->vy_ray / S_MAP > 0 && vars->vx_ray / S_MAP > 0 &&
+	vars->t_map[(int)(vars->vy_ray / S_MAP)]
+	[(int)(vars->vx_ray / S_MAP)] != '1')
 	{
-		vars->Vx_ray += vars->Xa;
-		vars->Vy_ray += vars->Ya;
+		vars->vx_ray += vars->xa;
+		vars->vy_ray += vars->ya;
 	}
-	vars->z_vertically = sqrt(pow(vars->plr_y - vars->Vy_ray, 2) + pow(vars->plr_x - vars->Vx_ray, 2));
+	vars->z_vertically = sqrt(pow(vars->plr_y - vars->vy_ray, 2)
+	+ pow(vars->plr_x - vars->vx_ray, 2));
 }
